@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="{% static 'scripts.js' %}"></script>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<header>
+    <a class="nav-brand" href="/">FakeCSV</a>
+    <a class="nav-pages" href="/schemas">Schemas</a>
+    <p class="nav-pages nav-user">Hello, <b>username</b></p>
+    <a class="nav-pages nav-logout" href="/logout">Logout</a>
+</header>
+{% block body %}{% endblock %}
+</body>
+</html>
