@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Data schemas{% endblock %}
+
+{% block body %}
+<div class="page-content">
+    <h2 class="data-sets-title">Data sets</h2>
+    <div class="data-sets-generate">
+        <label for="generate-rows">Rows: </label>
+        <input type="number" name="generate-rows" id="generate-rows" required>
+        <button class="new-schema-link">Generate data</button>
+    </div>
+    <table class="schemas-table">
+        <thead>
+        <tr>
+            <th class="table-id-row">#</th>
+            <th class="table-row">Created</th>
+            <th class="table-row">Status</th>
+            <th class="table-row">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th>1</th>
+            <td>2020-03-21</td>
+            <td><p class="status status-ready">Ready</p></td>
+            <td>
+                <a href="/">Download</a>
+            </td>
+        </tr>
+        <tr>
+            <th>2</th>
+            <td>2020-03-21</td>
+            <td><p class="status status-processing">Processing</p></td>
+            <td>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
