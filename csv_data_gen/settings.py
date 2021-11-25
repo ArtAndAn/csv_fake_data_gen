@@ -27,7 +27,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -68,6 +67,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'csv_data_gen.wsgi.application'
+
+LOGIN_REDIRECT_URL = 'schemas'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

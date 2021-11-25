@@ -9,10 +9,12 @@
 </head>
 <body>
 <header>
-    <a class="nav-brand" href="/">FakeCSV</a>
-    <a class="nav-pages" href="/schemas">Schemas</a>
-    <p class="nav-pages nav-user">Hello, <b>username</b></p>
-    <a class="nav-pages nav-logout" href="/logout">Logout</a>
+    <a class="nav-brand" href="{% url 'schemas' %}">FakeCSV</a>
+    <a class="nav-pages" href="{% url 'schemas' %}">Schemas</a>
+    {% if request.user.is_authenticated %}
+        <p class="nav-pages nav-user">Hello, <b>{{ request.user.username }}</b></p>
+        <a class="nav-pages nav-logout" href="{% url 'logout' %}">Logout</a>
+    {% endif %}
 </header>
 {% block body %}{% endblock %}
 </body>

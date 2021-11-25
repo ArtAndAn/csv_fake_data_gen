@@ -3,9 +3,12 @@
 {% block title %}Data schemas{% endblock %}
 
 {% block body %}
-<div class="page-content">
-    <h2 class="page-title">Data schemas</h2>
-    <a class="new-schema-link" href="/new_schema">New schema</a>
+<div class="schemas-page-content">
+    <div class="page-title-div">
+        <h2 class="page-title">Data schemas</h2>
+        <a class="new-schema-link" href="{% url 'new_schema' %}">New schema</a>
+    </div>
+    {% if object_list %}
     <table class="schemas-table">
         <thead>
         <tr>
@@ -16,16 +19,21 @@
         </tr>
         </thead>
         <tbody>
+        {% for schema in object_list %}
         <tr>
-        <th>1</th>
-        <td><a href="/">Customers</a></td>
-        <td>2020-03-16</td>
-        <td>
-            <a href="/">Edit scheme</a>
-            <a class="delete" href="/">Delete</a>
-        </td>
+            <th>1</th>
+            <td><a href="/">{{ schema.schema_name }}</a></td>
+            <td>{{ schema.modified_date }}</td>
+            <td>
+                <a href="/">Edit scheme</a>
+                <a class="delete" href="/">Delete</a>
+            </td>
         </tr>
+        {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <h4 class="no-schemas-msg">You don't have any data schemas yet</h4>
+    {% endif %}
 </div>
 {% endblock %}

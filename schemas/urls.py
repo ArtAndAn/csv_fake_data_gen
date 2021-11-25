@@ -2,7 +2,9 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
-    path('schemas', views.data_schemas, name='schemas'),
-    path('new-schema', views.new_schema, name='new_schema'),
+    path('schemas', views.DataSchemas.as_view(), name='schemas'),
+    path('new-schema', views.NewSchema.as_view(), name='new_schema'),
+    path('edit-schema', views.edit_schema, name='edit_schema'),
+    path('delete-schema', views.delete_schema, name='delete_schema'),
     path('data-sets', views.data_sets, name='data_sets'),
 ]

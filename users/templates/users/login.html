@@ -3,11 +3,17 @@
 {% block title %}Login{% endblock %}
 
 {% block body %}
-<form class="login-form">
+<form class="login-form" method="post">
     {% csrf_token %}
     <p class="login-form-title">Login</p>
     <input type="text" name="username" id="login-form-username" placeholder="Username" required>
     <input type="password" name="password" id="login-form-password" placeholder="Password" required>
+    {% if form.errors %}
+    <p class="error-msg">Your username and password didn't match. Please try again.</p>
+    {% endif %}
     <button type="submit">Login</button>
 </form>
+<script>
+    no_header()
+</script>
 {% endblock %}
