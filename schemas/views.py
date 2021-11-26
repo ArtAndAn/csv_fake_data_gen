@@ -4,7 +4,7 @@ from django.views import View
 from django.views.generic import ListView, DeleteView
 
 from schemas.helpers import SchemaDataMixin
-from schemas.models import Schema, SchemaColumn
+from schemas.models import Schema, SchemaColumn, DataSet
 
 
 class DataSchemas(LoginRequiredMixin, ListView):
@@ -116,5 +116,40 @@ class DeleteSchema(LoginRequiredMixin, DeleteView):
         schema_conf.delete()
 
 
-def data_sets(request):
-    return render(request, 'schemas/data_sets.html')
+class DataSetsView(LoginRequiredMixin, ListView):
+    model = DataSet
+    template_name = 'schemas/data_sets.html'
+    login_url = '/login'
+
+    def get(self, request, **kwargs):
+        self.object_list = self.get_queryset()
+        if not self.object_list:
+            return redirect('schemas')
+        context = self.get_context_data()
+        return self.render_to_response(context)
+
+    def get_queryset(self):
+        data_schema = Schema.objects.filter(user=self.request.user).filter(schema_name=self.kwargs['schema_name'])
+        if not data_schema:
+            return data_schema
+        data_sets = DataSet.objects.filter(schema=data_schema[0])
+
+        for i in range(len(data_sets)):
+            data_sets[i].created_date = data_sets[i].created_date.strftime('%d %B %Y %H:%M ')
+            data_sets[i].number = i + 1
+        context = {'data_sets': data_sets, 'schema_name': data_schema[0].schema_name}
+        return context
+
+
+class NewDataSetView(LoginRequiredMixin, View):
+    login_url = '/login'
+
+    def get(self, request, schema_name, rows):
+        schema_conf = Schema.objects.filter(user=request.user).filter(schema_name=schema_name)
+        if not schema_conf:
+            redirect('schemas')
+        schema_columns = SchemaColumn.objects.filter(schema_name=schema_conf[0])
+
+        separator = schema_conf[0].schema_separator
+        string_char = schema_conf[0].schema_string_char
+        pass

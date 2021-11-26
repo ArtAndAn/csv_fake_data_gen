@@ -80,14 +80,17 @@ function new_schema_type_select() {
     }
 }
 
-function no_header() {
-    document.querySelector('header').remove()
+function create_new_data_set_btn(schema_name) {
+    const create_btn = document.getElementById('create-new-data-set')
+    const rows_quantity_input = document.getElementById('generate-rows')
+
+    create_btn.addEventListener('click', () => {
+        const rows_quantity = rows_quantity_input.value
+        const url = '/new-data-set/'+ schema_name + '/' + rows_quantity
+        window.location.replace(url)
+    })
 }
 
-function fill_up_selects(conf, columns) {
-    const separator_select = document.getElementById('new-schema-sep')
-    const character_ = document.getElementById('new-schema-char')
-
-    separator_select.getElementsByTagName('option')
-
+function no_header() {
+    document.querySelector('header').remove()
 }

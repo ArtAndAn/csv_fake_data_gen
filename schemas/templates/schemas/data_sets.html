@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Data schemas{% endblock %}
+{% block title %}Data sets{% endblock %}
 
 {% block body %}
 <div class="schemas-page-content">
-    <h2 class="data-sets-title">Data sets</h2>
-    <div class="data-sets-generate">
-        <label for="generate-rows">Rows: </label>
-        <input type="number" name="generate-rows" id="generate-rows" required>
-        <button class="new-schema-link">Generate data</button>
+    <div class="page-title-div">
+        <h2 class="data-sets-title">Data sets</h2>
+        <div class="data-sets-generate">
+            <label for="generate-rows">Rows: </label>
+            <input type="number" name="generate-rows" id="generate-rows" required>
+            <button class="new-schema-link" id="create-new-data-set">Generate data</button>
+        </div>
     </div>
+    {% if object_list.data_sets %}
     <table class="schemas-table">
         <thead>
         <tr>
@@ -20,22 +23,28 @@
         </tr>
         </thead>
         <tbody>
+        {% for data_set in object_list.data_sets %}
         <tr>
-            <th>1</th>
-            <td>2020-03-21</td>
+            <th>{{ data_set.number }}</th>
+            <td>{{ data_set.created_date }}</td>
+            {% if data_set.status == 'Ready' %}
             <td><p class="status status-ready">Ready</p></td>
+            {% else %}
+            <td><p class="status status-processing">Processing</p></td>
+            {% endif %}
             <td>
                 <a href="/">Download</a>
             </td>
         </tr>
-        <tr>
-            <th>2</th>
-            <td>2020-03-21</td>
-            <td><p class="status status-processing">Processing</p></td>
-            <td>
-            </td>
-        </tr>
+        {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <h4 class="no-schemas-msg">You don't have any data sets for this schema yet</h4>
+    {% endif %}
 </div>
+<script>
+    const schema_name = '{{ object_list.schema_name }}'
+    create_new_data_set_btn(schema_name)
+</script>
 {% endblock %}

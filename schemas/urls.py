@@ -6,5 +6,6 @@ urlpatterns = [
     path('new-schema', views.NewSchema.as_view(), name='new_schema'),
     path('edit-schema/<str:schema_name>', views.EditSchema.as_view(), name='edit_schema'),
     path('delete-schema/<str:schema_name>', views.DeleteSchema.as_view(), name='delete_schema'),
-    path('data-sets', views.data_sets, name='data_sets'),
+    path('data-sets/<str:schema_name>', views.DataSetsView.as_view(), name='data_sets'),
+    path('new-data-set/<str:schema_name>/<int:rows>', views.NewDataSetView.as_view(), name='new_data_set'),
 ]

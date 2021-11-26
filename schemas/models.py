@@ -23,3 +23,13 @@ class SchemaColumn(models.Model):
 
     def __str__(self):
         return self.column_name
+
+
+class DataSet(models.Model):
+    slug = models.SlugField(blank=False)
+    created_date = models.DateTimeField(auto_now_add=True, blank=False)
+    status = models.CharField(max_length=50, default='Processing', blank=False)
+    schema = models.ForeignKey(Schema, on_delete=models.CharField, blank=False)
+
+    def __str__(self):
+        return self.slug
