@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Data schemas{% endblock %}
+{% block title %}New schema{% endblock %}
 
 {% block body %}
 <div class="schemas-page-content">
@@ -32,13 +32,13 @@
             <h2>Schema columns</h2>
             <div class="new-schema-row" id="new-schema-row-1">
                 <div class="field column-name">
-                    <label for="column-namesss">Column name</label>
-                    <input type="text" name="column-name-1" id="column-namesss" placeholder="Name" maxlength="100"
+                    <label for="column-name-1">Column name</label>
+                    <input type="text" name="column-name-1" id="column-name-1" placeholder="Name" maxlength="100"
                            required>
                 </div>
                 <div class="field column-type">
-                    <label for="column-type">Type</label>
-                    <select name="column-type-1" id="column-type">
+                    <label for="column-type-1">Type</label>
+                    <select name="column-type-1" id="column-type-1">
                         <option>Full name</option>
                         <option>Job</option>
                         <option>Email</option>
@@ -51,8 +51,8 @@
                     </select>
                 </div>
                 <div class="field column-order">
-                    <label for="column-order">Order</label>
-                    <input type="number" name="column-order-1" min="1" id="column-order" required>
+                    <label for="column-order-1">Order</label>
+                    <input type="number" name="column-order-1" min="1" id="column-order-1" required>
                 </div>
                 <button type="button" class="new-schema-delete" id="row-delete-1">Delete</button>
             </div>

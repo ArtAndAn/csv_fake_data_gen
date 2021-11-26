@@ -83,3 +83,11 @@ function new_schema_type_select() {
 function no_header() {
     document.querySelector('header').remove()
 }
+
+function fill_up_selects(conf, columns) {
+    const separator_select = document.getElementById('new-schema-sep')
+    const character_ = document.getElementById('new-schema-char')
+
+    separator_select.getElementsByTagName('option')
+
+}

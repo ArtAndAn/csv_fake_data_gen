@@ -21,12 +21,12 @@
         <tbody>
         {% for schema in object_list %}
         <tr>
-            <th>1</th>
+            <th>{{ schema.number }}</th>
             <td><a href="/">{{ schema.schema_name }}</a></td>
             <td>{{ schema.modified_date }}</td>
             <td>
-                <a href="/">Edit scheme</a>
-                <a class="delete" href="/">Delete</a>
+                <a href="{% url 'edit_schema' schema_name=schema.schema_name %}">Edit scheme</a>
+                <a class="delete" href="{% url 'delete_schema' schema_name=schema.schema_name %}">Delete</a>
             </td>
         </tr>
         {% endfor %}
