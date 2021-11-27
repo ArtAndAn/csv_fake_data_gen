@@ -2,6 +2,10 @@ from schemas.models import Schema
 
 
 class SchemaDataMixin:
+    """
+    Mixin that validates Schema data and arranges Schema columns from form in dict
+    """
+
     def create_columns(self, form):
         columns = {}
         for field in form.keys():

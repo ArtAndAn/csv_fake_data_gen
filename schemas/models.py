@@ -32,7 +32,6 @@ class DataSet(models.Model):
     schema = models.ForeignKey(Schema, on_delete=models.CASCADE, blank=False)
     csv_file = models.FileField(blank=False)
 
-
     def __str__(self):
         return self.slug
 

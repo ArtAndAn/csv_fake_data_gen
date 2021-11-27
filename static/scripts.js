@@ -1,4 +1,6 @@
 function new_schema_add_column_btn() {
+    // Function for adding an EventListener to Add column button that
+    // generates and adds a new row on the page
     const btn = document.getElementById('add-column-btn')
     const new_columns_div = document.getElementById('new-schema-columns')
     let new_row_number = new_columns_div.childElementCount
@@ -40,6 +42,8 @@ function new_schema_add_column_btn() {
 }
 
 function new_schema_delete_row_btn() {
+    // Function for adding an EventListener to Delete row button that
+    // deletes single row on the page
     const delete_btns = document.getElementsByClassName('new-schema-delete')
     for (let i = 0; i < delete_btns.length; i++) {
         delete_btns[i].addEventListener('click', (event) => {
@@ -49,6 +53,8 @@ function new_schema_delete_row_btn() {
 }
 
 function new_schema_type_select() {
+    // Function for adding an EventListener to column type selects that
+    // generates and adds range inputs on the column row
     const type_selects = document.getElementById('new-schema-columns')
         .getElementsByTagName('select')
     for (let i = 0; i < type_selects.length; i++) {
@@ -81,16 +87,21 @@ function new_schema_type_select() {
 }
 
 function create_new_data_set_btn(schema_name) {
+    // Function for adding an EventListener to New dataset button that
+    // redirects user on the data set creation page
     const create_btn = document.getElementById('create-new-data-set')
     const rows_quantity_input = document.getElementById('generate-rows')
 
     create_btn.addEventListener('click', () => {
-        const rows_quantity = rows_quantity_input.value
-        const url = '/new-data-set/'+ schema_name + '/' + rows_quantity
-        window.location.replace(url)
+        if (rows_quantity_input.value) {
+            const rows_quantity = rows_quantity_input.value
+            const url = '/new-data-set/' + schema_name + '/' + rows_quantity
+            window.location.replace(url)
+        }
     })
 }
 
 function no_header() {
+    // Function for removing the header on login page
     document.querySelector('header').remove()
 }

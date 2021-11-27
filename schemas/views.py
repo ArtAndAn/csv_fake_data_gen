@@ -1,11 +1,7 @@
-import csv
-import random
-import string
 from datetime import datetime
 
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.files import File
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -14,9 +10,15 @@ from slugify import slugify
 
 from schemas.helpers import SchemaDataMixin
 from schemas.models import Schema, SchemaColumn, DataSet, FakeData
+from schemas.tasks import fill_up_csv
 
 
 class DataSchemas(LoginRequiredMixin, ListView):
+    """
+    View for showing User created DataSchemas if they exists or
+    showing message that DataSchemas are not filled up yet
+    (available only for logged in users)
+    """
     model = Schema
     template_name = 'schemas/schemas.html'
     login_url = '/login'
@@ -30,6 +32,10 @@ class DataSchemas(LoginRequiredMixin, ListView):
 
 
 class NewSchema(SchemaDataMixin, LoginRequiredMixin, View):
+    """
+    View for saving a new DataSchema
+    (available only for logged in users)
+    """
     login_url = '/login'
 
     def get(self, request):
@@ -63,6 +69,10 @@ class NewSchema(SchemaDataMixin, LoginRequiredMixin, View):
 
 
 class EditSchema(SchemaDataMixin, LoginRequiredMixin, View):
+    """
+    View for updating a DataSchema
+    (available only for logged in users)
+    """
     login_url = '/login'
 
     def get(self, request, schema_name):
@@ -111,6 +121,10 @@ class EditSchema(SchemaDataMixin, LoginRequiredMixin, View):
 
 
 class DeleteSchema(LoginRequiredMixin, DeleteView):
+    """
+    View for deleting a DataSchema
+    (available only for logged in users)
+    """
     login_url = '/login'
 
     def get(self, request, **kwargs):
@@ -126,6 +140,11 @@ class DeleteSchema(LoginRequiredMixin, DeleteView):
 
 
 class DataSetsView(LoginRequiredMixin, ListView):
+    """
+    View for showing User created DataSets filtered by specified DataSchema and their statuses if they exists or
+    showing message that DataSets are not created yet
+    (available only for logged in users)
+    """
     model = DataSet
     template_name = 'schemas/data_sets.html'
     login_url = '/login'
@@ -152,6 +171,11 @@ class DataSetsView(LoginRequiredMixin, ListView):
 
 
 class NewDataSetView(LoginRequiredMixin, View):
+    """
+    View for creating new DataSets
+    CSV files filling up processes executes inside Celery backend
+    (available only for logged in users)
+    """
     login_url = '/login'
 
     def get(self, request, schema_name, rows):
@@ -160,47 +184,29 @@ class NewDataSetView(LoginRequiredMixin, View):
             redirect('schemas')
         slug = slugify(f'{schema_name} {request.user} {datetime.today().strftime("%d %B %Y %H:%M:%S")}')
 
-        schema_columns = SchemaColumn.objects.filter(schema_name=schema_conf[0]).order_by('column_order')
-
         separator = schema_conf[0].schema_separator
         separator_char = separator[separator.index('(') + 1:separator.index(')')]
         string_char = schema_conf[0].schema_string_char[-2]
 
         csv_file_path = f'media/{slug}.csv'
 
-        with open(csv_file_path, 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=separator_char, quotechar=string_char, quoting=csv.QUOTE_ALL)
-
-            column_names = ['number']
-            column_names += [column.column_name for column in schema_columns]
-            writer.writerow(column_names)
-
-            for i in range(rows + 1):
-                row = [i]
-                for column in schema_columns:
-                    if column.column_type == 'Text':
-                        data = ''.join(
-                            random.choice(string.ascii_lowercase) for x in range(column.column_from, column.column_to))
-                        row.append(data)
-                    elif column.column_type == 'Integer':
-                        data = random.randint(column.column_from, column.column_to)
-                        row.append(data)
-                    else:
-                        data_qs = FakeData.objects.filter(type=column.column_type)
-                        row.append(random.choice(data_qs))
-                writer.writerow(row)
-            file.close()
+        fill_up_csv.delay(file_path=csv_file_path, slug=slug, separator=separator_char,
+                          string_char=string_char, schema_name=schema_conf[0].schema_name, rows=rows)
 
         new_data_set = DataSet()
         new_data_set.slug = slug
         new_data_set.schema = schema_conf[0]
         new_data_set.csv_file.name = csv_file_path
         new_data_set.save()
+
         return redirect('data_sets', schema_name=schema_name)
 
 
 @method_decorator(user_passes_test(lambda user: user.is_superuser), 'get')
 class AddFakeData(LoginRequiredMixin, View):
+    """
+    View for adding fake data to DB (available only for superuser)
+    """
 
     def get(self, request):
         if FakeData.objects.all():

@@ -33,7 +33,9 @@
             <td><p class="status status-processing">Processing</p></td>
             {% endif %}
             <td>
+                {% if data_set.status == 'Ready' %}
                 <a href="{{ data_set.csv_file.url }}">Download</a>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
