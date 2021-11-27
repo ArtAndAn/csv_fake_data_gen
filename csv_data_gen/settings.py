@@ -31,8 +31,10 @@ ALLOWED_HOSTS = ['*']
 CELERY_TIMEZONE = "Europe/Kiev"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-BROKER_URL = os.environ['REDIS_URL']
-CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
+BROKER_URL = 'redis://:pba6621e8f89293ba6e3ac5d1c53de2e34a187b60009326419a06d4bde4f2b8cf@ec2-54-73-30-221' \
+             '.eu-west-1.compute.amazonaws.com:20070'
+CELERY_RESULT_BACKEND = 'redis://:pba6621e8f89293ba6e3ac5d1c53de2e34a187b60009326419a06d4bde4f2b8cf@ec2-54-73-30-221' \
+                        '.eu-west-1.compute.amazonaws.com:20070'
 
 # Application definition
 INSTALLED_APPS = [
