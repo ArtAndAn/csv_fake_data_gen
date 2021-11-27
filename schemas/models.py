@@ -29,7 +29,17 @@ class DataSet(models.Model):
     slug = models.SlugField(blank=False)
     created_date = models.DateTimeField(auto_now_add=True, blank=False)
     status = models.CharField(max_length=50, default='Processing', blank=False)
-    schema = models.ForeignKey(Schema, on_delete=models.CharField, blank=False)
+    schema = models.ForeignKey(Schema, on_delete=models.CASCADE, blank=False)
+    csv_file = models.FileField(blank=False)
+
 
     def __str__(self):
         return self.slug
+
+
+class FakeData(models.Model):
+    type = models.CharField(max_length=500, blank=False)
+    data = models.TextField(max_length=500, blank=False)
+
+    def __str__(self):
+        return self.data

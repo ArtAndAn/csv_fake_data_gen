@@ -1,10 +1,19 @@
+import csv
+import random
+import string
+from datetime import datetime
+
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files import File
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DeleteView
+from slugify import slugify
 
 from schemas.helpers import SchemaDataMixin
-from schemas.models import Schema, SchemaColumn, DataSet
+from schemas.models import Schema, SchemaColumn, DataSet, FakeData
 
 
 class DataSchemas(LoginRequiredMixin, ListView):
@@ -129,13 +138,14 @@ class DataSetsView(LoginRequiredMixin, ListView):
         return self.render_to_response(context)
 
     def get_queryset(self):
-        data_schema = Schema.objects.filter(user=self.request.user).filter(schema_name=self.kwargs['schema_name'])
+        data_schema = Schema.objects.filter(user=self.request.user).filter(
+            schema_name=self.kwargs['schema_name'])
         if not data_schema:
             return data_schema
-        data_sets = DataSet.objects.filter(schema=data_schema[0])
+        data_sets = DataSet.objects.filter(schema=data_schema[0]).order_by('-created_date')
 
         for i in range(len(data_sets)):
-            data_sets[i].created_date = data_sets[i].created_date.strftime('%d %B %Y %H:%M ')
+            data_sets[i].created_date = data_sets[i].created_date.strftime('%d %B %Y %H:%M')
             data_sets[i].number = i + 1
         context = {'data_sets': data_sets, 'schema_name': data_schema[0].schema_name}
         return context
@@ -148,8 +158,83 @@ class NewDataSetView(LoginRequiredMixin, View):
         schema_conf = Schema.objects.filter(user=request.user).filter(schema_name=schema_name)
         if not schema_conf:
             redirect('schemas')
-        schema_columns = SchemaColumn.objects.filter(schema_name=schema_conf[0])
+        slug = slugify(f'{schema_name} {request.user} {datetime.today().strftime("%d %B %Y %H:%M:%S")}')
+
+        schema_columns = SchemaColumn.objects.filter(schema_name=schema_conf[0]).order_by('column_order')
 
         separator = schema_conf[0].schema_separator
-        string_char = schema_conf[0].schema_string_char
-        pass
+        separator_char = separator[separator.index('(') + 1:separator.index(')')]
+        string_char = schema_conf[0].schema_string_char[-2]
+
+        csv_file_path = f'media/{slug}.csv'
+
+        with open(csv_file_path, 'w', newline='') as file:
+            writer = csv.writer(file, delimiter=separator_char, quotechar=string_char, quoting=csv.QUOTE_ALL)
+
+            column_names = ['number']
+            column_names += [column.column_name for column in schema_columns]
+            writer.writerow(column_names)
+
+            for i in range(rows + 1):
+                row = [i]
+                for column in schema_columns:
+                    if column.column_type == 'Text':
+                        data = ''.join(
+                            random.choice(string.ascii_lowercase) for x in range(column.column_from, column.column_to))
+                        row.append(data)
+                    elif column.column_type == 'Integer':
+                        data = random.randint(column.column_from, column.column_to)
+                        row.append(data)
+                    else:
+                        data_qs = FakeData.objects.filter(type=column.column_type)
+                        row.append(random.choice(data_qs))
+                writer.writerow(row)
+            file.close()
+
+        new_data_set = DataSet()
+        new_data_set.slug = slug
+        new_data_set.schema = schema_conf[0]
+        new_data_set.csv_file.name = csv_file_path
+        new_data_set.save()
+        return redirect('data_sets', schema_name=schema_name)
+
+
+@method_decorator(user_passes_test(lambda user: user.is_superuser), 'get')
+class AddFakeData(LoginRequiredMixin, View):
+
+    def get(self, request):
+        if FakeData.objects.all():
+            return redirect('schemas')
+        full_names = ['Safia Dunn', 'Nansi Whitaker', 'Opal Duffy', 'Elize Oliver', 'Rohit Franklin', 'Bogdan Neale',
+                      'Rihanna Lacey', 'Addison Jensen', 'Kodi Travers', 'Rajveer Stewart', 'Randall Spooner',
+                      'Arwa Pearson', 'Ebrahim Marks', 'Sia Hughes', 'Marius Gay', 'Halimah Vance', 'Nuala Chester',
+                      'Myla Lu', 'Luke Deacon', 'Inaya Portillo']
+        jobs = ['Economist', 'College Professor', 'Chef', 'Hairdresser', 'Event Planner', 'Marketing Manager',
+                'Dancer', 'Receptionist', 'Personal Care Aide', 'Chemist', 'Physician', 'Secretary',
+                'Clinical Laboratory Technician', 'Patrol Officer', 'Anthropologist', 'Respiratory Therapist',
+                'Computer Programmer', 'Housekeeper', 'Computer Systems Administrator', 'Librarian']
+        emails = ['mmjjii41@googleappsmail.com', 'nicepahar@reprecentury.xyz', 'biggstick@oreple.com',
+                  'flaystus@ffo.kr', 'cyndrical@yandex.cfd', 'arianasanamb@kimsangun.com', 'az0tooops@suttal.com',
+                  'popovim@convoitu.com', 'cscp187918@googl.win', 'xkuzyx1999@cesitayedrive.live', 'hiwinks@codee.site',
+                  'polysikk@txtsp.site', 'poppens7@sonophon.ru', 'alekseymirea@ndmlpife.com',
+                  'kristencaschera@googl.win', 'olegbuba@lsnttttw.com', 'mcse47@azwd.site', 'rw93082@lsnttttw.com',
+                  'arundev@gumaygo.com', 'wavewash@btcmod.com']
+        domains = ['flaio.com', 'conpi.com', 'cicvu.com', 'kumbu.com', 'naraa.com', 'famzi.com', 'amaku.com',
+                   'recao.com', 'sarre.com', 'dhaqo.com', 'momwi.com', 'forhe.com', 'ausqo.com', 'walmi.com',
+                   'bibgu.com', 'jesnu.com', 'carqo.com', 'arike.com', 'curio.com', 'kioua.com']
+        tel_numbers = ['240-638-8309', '510-656-5604', '770-296-9560', '484-926-1360', '718-616-8462', '330-916-2874',
+                       '276-236-5111', '973-829-9568', '618-315-8773', '619-287-1586', '706-596-4292', '323-230-2215',
+                       '843-243-7387', '815-336-0616', '210-786-4287', '818-565-7956', '979-710-3434', '773-906-3883',
+                       '860-489-0984', '785-848-8457']
+        companies = ['Vertex FakeData', 'Seedling FakeData', 'Type FakeData', 'Retreat FakeData', 'Monk FakeData',
+                     'Physical FakeData', 'Friendly FakeData', 'Centre FakeData', 'FakeDataopolis', 'Posh FakeData',
+                     'Hue FakeData', 'Cruise FakeData', 'Dome FakeData', 'Karuna FakeData', 'Painter FakeData',
+                     'Incubator FakeData', 'Club FakeData', 'Round FakeData', 'Grand FakeData', 'Creative FakeData']
+        full_data = [FakeData(type='Full name', data=data) for data in full_names]
+        full_data += [FakeData(type='Job', data=data) for data in jobs]
+        full_data += [FakeData(type='Email', data=data) for data in emails]
+        full_data += [FakeData(type='Domain name', data=data) for data in domains]
+        full_data += [FakeData(type='Phone number', data=data) for data in tel_numbers]
+        full_data += [FakeData(type='Company name', data=data) for data in companies]
+        FakeData.objects.bulk_create(full_data)
+        return redirect('schemas')

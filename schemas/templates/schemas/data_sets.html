@@ -33,7 +33,7 @@
             <td><p class="status status-processing">Processing</p></td>
             {% endif %}
             <td>
-                <a href="/">Download</a>
+                <a href="{{ data_set.csv_file.url }}">Download</a>
             </td>
         </tr>
         {% endfor %}

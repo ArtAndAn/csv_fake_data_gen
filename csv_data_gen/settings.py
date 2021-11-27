@@ -26,6 +26,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# Celery settings
+CELERY_TIMEZONE = "Europe/Kiev"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -69,6 +74,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'csv_data_gen.wsgi.application'
 
 LOGIN_REDIRECT_URL = 'schemas'
+LOGIN_URL = 'login'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -124,6 +130,9 @@ STATIC_ROOT = ''
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+
+MEDIA_ROOT = ''
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
