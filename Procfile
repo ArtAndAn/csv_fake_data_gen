@@ -1,2 +1,2 @@
 web: gunicorn api.wsgi
-worker: celery worker --app=tasks.app
+worker: celery worker --app
