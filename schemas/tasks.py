@@ -5,6 +5,7 @@ import string
 
 from celery import shared_task
 
+from .helpers import DropBoxFiles
 from .models import FakeData, SchemaColumn, DataSet
 
 
@@ -15,7 +16,7 @@ def fill_up_csv(file_path, slug, separator, string_char, schema_name, rows):
     On completion - changing DataSet status to 'Ready'
     """
     schema_columns = SchemaColumn.objects.filter(schema_name__schema_name=schema_name).order_by('column_order')
-    with open(file_path, 'w', newline='') as file:
+    with open(file_path, 'a+', newline='', ) as file:
         writer = csv.writer(file, delimiter=separator, quotechar=string_char, quoting=csv.QUOTE_ALL)
 
         column_names = ['number']
@@ -40,7 +41,9 @@ def fill_up_csv(file_path, slug, separator, string_char, schema_name, rows):
                     data_qs = FakeData.objects.filter(type=column.column_type)
                     row.append(random.choice(data_qs))
             writer.writerow(row)
-
+        file.seek(0)
+        dropbox = DropBoxFiles()
+        dropbox.create_file(slug=slug, file=file)
         file.close()
     data_set = DataSet.objects.get(slug=slug)
     data_set.status = 'Ready'

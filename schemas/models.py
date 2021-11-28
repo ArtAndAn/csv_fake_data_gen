@@ -30,7 +30,6 @@ class DataSet(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, blank=False)
     status = models.CharField(max_length=50, default='Processing', blank=False)
     schema = models.ForeignKey(Schema, on_delete=models.CASCADE, blank=False)
-    csv_file = models.FileField(blank=False)
 
     def __str__(self):
         return self.slug

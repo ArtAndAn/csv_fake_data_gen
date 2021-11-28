@@ -2,13 +2,14 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DeleteView
 from slugify import slugify
 
-from schemas.helpers import SchemaDataMixin
+from schemas.helpers import SchemaDataMixin, DropBoxFiles
 from schemas.models import Schema, SchemaColumn, DataSet, FakeData
 from schemas.tasks import fill_up_csv
 
@@ -190,16 +191,28 @@ class NewDataSetView(LoginRequiredMixin, View):
 
         csv_file_path = f'media/{slug}.csv'
 
-        fill_up_csv.delay(file_path=csv_file_path, slug=slug, separator=separator_char,
-                          string_char=string_char, schema_name=schema_conf[0].schema_name, rows=rows)
-
         new_data_set = DataSet()
         new_data_set.slug = slug
         new_data_set.schema = schema_conf[0]
-        new_data_set.csv_file.name = csv_file_path
         new_data_set.save()
 
+        fill_up_csv.delay(file_path=csv_file_path, slug=slug, separator=separator_char,
+                          string_char=string_char, schema_name=schema_conf[0].schema_name, rows=rows)
         return redirect('data_sets', schema_name=schema_name)
+
+
+class GetCSVFile(LoginRequiredMixin, View):
+    """
+    View for downloading CSV file
+    """
+
+    def get(self, request, dataset_slug):
+        dropbox = DropBoxFiles()
+        filename = '/' + dataset_slug + '.csv'
+        file = dropbox.get_file(filename=filename)
+        response = HttpResponse(file, content_type='application/CSV')
+        response['Content-Disposition'] = f'attachment; filename={dataset_slug}.csv'
+        return response
 
 
 @method_decorator(user_passes_test(lambda user: user.is_superuser), 'get')

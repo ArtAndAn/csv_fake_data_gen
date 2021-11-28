@@ -34,7 +34,7 @@
             {% endif %}
             <td>
                 {% if data_set.status == 'Ready' %}
-                <a href="{{ data_set.csv_file.url }}">Download</a>
+                <a href="{% url 'download' dataset_slug=data_set.slug %}">Download</a>
                 {% endif %}
             </td>
         </tr>

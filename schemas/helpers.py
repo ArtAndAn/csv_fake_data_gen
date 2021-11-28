@@ -1,3 +1,5 @@
+import dropbox as dropbox
+
 from schemas.models import Schema
 
 
@@ -48,3 +50,21 @@ class SchemaDataMixin:
                     'field': 'column-range',
                     'message': 'Range "From" cannot be bigger than range "To"'}}
             order.append(config['column-order'])
+
+
+class DropBoxFiles:
+    """
+    All CSV view are stored in DropBox.
+    Each saving/downloading CSV file operation makes it through Dropbox.
+    """
+    dbx = dropbox.Dropbox(
+        'sl.A9IwSjX-SQsdXge_L6UBRe6ONlI9j3RqC9Zk5hX_j9UlwtJpvtFdGvDk-E-gYyzDxHCUDuQr5GgDze569VfpbnLDaHQ13kgxPVBpFmlKaawbkmHAqFOKtueBskZRpjJK8JhyJVGXYD4')
+
+    def get_file(self, filename):
+        f, r = self.dbx.files_download(filename)
+        return r.content
+
+    def create_file(self, slug, file):
+        bytes_file = bytes(file.read(), 'utf-8')
+        filename = '/' + slug + '.csv'
+        self.dbx.files_upload(bytes_file, filename)
