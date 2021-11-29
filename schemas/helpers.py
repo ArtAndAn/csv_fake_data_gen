@@ -1,5 +1,3 @@
-import os
-
 import dropbox as dropbox
 
 from schemas.models import Schema
@@ -59,8 +57,8 @@ class DropBoxFiles:
     All CSV view are stored in DropBox.
     Each saving/downloading CSV file operation makes it through Dropbox.
     """
-    key = os.environ['DROPBOX_KEY']
-    dbx = dropbox.Dropbox(key)
+    dbx = dropbox.Dropbox(
+        'sl.A9IwSjX-SQsdXge_L6UBRe6ONlI9j3RqC9Zk5hX_j9UlwtJpvtFdGvDk-E-gYyzDxHCUDuQr5GgDze569VfpbnLDaHQ13kgxPVBpFmlKaawbkmHAqFOKtueBskZRpjJK8JhyJVGXYD4')
 
     def get_file(self, filename):
         f, r = self.dbx.files_download(filename)
