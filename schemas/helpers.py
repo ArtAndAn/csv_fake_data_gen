@@ -59,7 +59,7 @@ class DropBoxFiles:
     All CSV view are stored in DropBox.
     Each saving/downloading CSV file operation makes it through Dropbox.
     """
-    dbx = dropbox.Dropbox(os.environ['REDIS_URL'])
+    dbx = dropbox.Dropbox('i_gfxAZNFswAAAAAAAAAAa0T69bi2r4pVnCd6MC9c4K_Ceh7kCfVBO8H-7ts0ke6')
 
     def get_file(self, filename):
         f, r = self.dbx.files_download(filename)
